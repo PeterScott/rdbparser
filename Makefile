@@ -1,6 +1,15 @@
 CFLAGS = -O2 -std=c99
 
-OBJECTS = lzf_c.o lzf_d.o crc64.o output.o redis-check-dump.o
+COMMON = lzf_c.o lzf_d.o crc64.o redis-check-dump.o
 
-all: $(OBJECTS)
-	cc $(OBJECTS) -o redis-check-dump
+all: biggest dump
+
+biggest: $(COMMON) heap.o largest.o
+	cc $^ -o $@
+
+dump: $(COMMON) output.o
+	cc $^ -o $@
+
+
+clean:
+	rm -f *.o dump biggest

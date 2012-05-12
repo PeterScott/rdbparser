@@ -1,6 +1,9 @@
 #ifndef __OUTPUT_H
 #define __OUTPUT_H
 
+/* Initialize output module */
+void initOutput(void);
+
 /* Set the key of the current item */
 void setKey(char *k);
 

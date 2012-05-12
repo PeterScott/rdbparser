@@ -652,6 +652,8 @@ int main(int argc, char **argv) {
     struct stat stat;
     void *data;
 
+    initOutput();
+
     fd = open(argv[1], O_RDONLY);
     if (fd < 1) {
         ERROR("Cannot open file: %s\n", argv[1]);
