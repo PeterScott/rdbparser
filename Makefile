@@ -4,7 +4,7 @@ COMMON = lzf_c.o lzf_d.o crc64.o redis-check-dump.o
 
 all: biggest dump
 
-biggest: $(COMMON) heap.o largest.o
+biggest: $(COMMON) largest.o
 	cc $^ -o $@
 
 dump: $(COMMON) output.o

@@ -4,14 +4,14 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "heap.h"
+#include "iheap.h"
 #include "output.h"
 
-heap topn;
+struct iheap topn;
 int heapCount;
 
 void initOutput(void) {
-  heap_create(&topn, 0, NULL);
+  iheap_init(&topn);
   heapCount = 0;
 }
 
@@ -22,15 +22,14 @@ void setKey(char *k) {
 
 /* Set up the current item's value container */
 void newString(char *v) {
-  int *len = malloc(sizeof(int));
-  *len = strlen(v);
-  heap_insert(&topn, len, v);
+  struct iheap_node *n = malloc(sizeof(struct iheap_node));
+  iheap_node_init(n, strlen(v), v);
+  iheap_insert(&topn, n);
   heapCount++;
 
   if (heapCount > 3) {
-    char *evicted; int *temp;
-    heap_delmin(&topn, (void**)&temp, (void**)&evicted);
-    free(evicted); free(temp);
+    n = iheap_take(&topn);
+    free(iheap_node_value(n)); free(n);
   }
 }
 
@@ -70,8 +69,11 @@ void addToHash(char *k, char *v) {
 /* Process this and then deallocate it. */
 void finishProcessing(void) {
   char *evicted; int *temp;
-  while (heap_delmin(&topn, (void**)&temp, (void**)&evicted)) {
-    printf("[%i] %s\n", *temp, evicted);
-    free(temp); free(evicted);
+  struct iheap_node *n;
+  while (!iheap_empty(&topn)) {
+    n = iheap_take(&topn);
+    evicted = iheap_node_value(n);
+    printf("[%i] %s\n", n->key, evicted);
+    free(evicted); free(n);
   }
 }
