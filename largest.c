@@ -9,6 +9,7 @@
 
 struct iheap topn;
 int heapCount;
+char *oldKey = NULL;
 
 void initOutput(void) {
   iheap_init(&topn);
@@ -17,13 +18,14 @@ void initOutput(void) {
 
 /* Set the key of the current item */
 void setKey(char *k) {
-  free(k);
+  if (oldKey != NULL) free(oldKey);
+  oldKey = k;
 }
 
 /* Set up the current item's value container */
 void newString(char *v) {
   struct iheap_node *n = malloc(sizeof(struct iheap_node));
-  iheap_node_init(n, strlen(v), v);
+  iheap_node_init(n, strlen(v), strdup(oldKey));
   iheap_insert(&topn, n);
   heapCount++;
 

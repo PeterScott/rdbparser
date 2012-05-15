@@ -533,13 +533,6 @@ void printValid(uint64_t ops, uint64_t bytes) {
     printCentered(4, 80, body);
 }
 
-void printSkipped(uint64_t bytes, uint64_t offset) {
-    char body[80];
-    sprintf(body, "Skipped %llu bytes (resuming at 0x%08llx)",
-        (unsigned long long) bytes, (unsigned long long) offset);
-    printCentered(4, 80, body);
-}
-
 void process() {
     uint64_t num_errors = 0, num_valid_ops = 0, num_valid_bytes = 0;
     entry entry;
@@ -582,11 +575,6 @@ void process() {
                 }
             }
 
-            /* print how many bytes we have skipped to find a new valid opcode */
-            if (offset < positions[0].size) {
-                printSkipped(offset - positions[0].offset, offset);
-            }
-
             positions[0].offset = offset;
         } else {
             num_valid_ops++;
@@ -608,26 +596,6 @@ void process() {
         entry.type = -1;
 
         num_errors++;
-    }
-
-    /* Verify checksum */
-    if (dump_version >= 5) {
-        uint64_t crc = crc64(0,positions[0].data,positions[0].size);
-        uint64_t crc2;
-        unsigned char *p = (unsigned char*)positions[0].data+positions[0].size;
-        crc2 = ((uint64_t)p[0] << 0) |
-               ((uint64_t)p[1] << 8) |
-               ((uint64_t)p[2] << 16) |
-               ((uint64_t)p[3] << 24) |
-               ((uint64_t)p[4] << 32) |
-               ((uint64_t)p[5] << 40) |
-               ((uint64_t)p[6] << 48) |
-               ((uint64_t)p[7] << 56);
-        if (crc != crc2) {
-            SHIFT_ERROR(positions[0].offset, "RDB CRC64 does not match.");
-        } else {
-            printf("CRC64 checksum is OK\n");
-        }
     }
 
     /* print summary on errors */
